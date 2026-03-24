@@ -1,0 +1,3 @@
+displayName = Calamity Elergy
+author = Forbider
+version = 0.1
