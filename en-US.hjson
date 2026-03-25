@@ -5,6 +5,11 @@ Mods: {
 				DisplayName: Sea Of Origin
 				Tooltip: ""
 			}
+
+			ElegyAltarItem: {
+				DisplayName: Elegy Altar Item
+				Tooltip: ""
+			}
 		}
 	}
 }

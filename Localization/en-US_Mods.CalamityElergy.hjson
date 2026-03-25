@@ -10,4 +10,6 @@ Items: {
 			It's snowing on Mt.Fuji
 			'''
 	}
+
+	ElegyAltarItem.DisplayName: ElegyAltar
 }

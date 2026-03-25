@@ -1,0 +1,16 @@
+# This file will automatically update with entries for new content after a build and reload.
+
+Items: {
+	SeaOfOrigin: {
+		DisplayName: 始源之海
+		Tooltip:
+			'''
+			Template of an item
+			Replacing this tooltip is duty 
+			It's snowing on Mt.Fuji
+			'''
+	}
+	ElegyAltarItem: {
+		DisplayName: 深海祭坛
+	}
+}

@@ -10,7 +10,10 @@
 
 	<!-- References -->
 	<ItemGroup>
-		
+		<Reference Include="SubworldLibrary">
+			<HintPath>../../../../Mods/enabled/SubworldLibrary.dll</HintPath> 
+			<Private>False</Private>
+		</Reference>
 	</ItemGroup>
 
 </Project>
