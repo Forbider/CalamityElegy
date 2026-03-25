@@ -1,3 +1,9 @@
-displayName = Calamity Elergy
+displayName = Calamity Elegy
+name = CalamityElegy
 author = Forbider
 version = 0.1
+hideCode = false
+hideResources = false
+includeSource = true
+# 核心引用：这行决定了它是灾厄的附属
+modDependencies = CalamityMod
