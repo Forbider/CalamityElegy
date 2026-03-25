@@ -2,7 +2,7 @@
 
 Items: {
 	SeaOfOrigin: {
-		DisplayName: "Sea Of Origin"
+		DisplayName: Sea Of Origin
 		Tooltip:
 			'''
 			Template of an item
