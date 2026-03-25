@@ -1,0 +1,10 @@
+Mods: {
+	CalamityElegy: {
+		Items: {
+			SeaOfOrigin: {
+				DisplayName: Sea Of Origin
+				Tooltip: ""
+			}
+		}
+	}
+}
