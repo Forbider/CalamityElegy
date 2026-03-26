@@ -64,7 +64,7 @@ namespace CalamityElegy.Content.Subworlds
 
             // 4. 设置玩家出生点
             // 我们可以让玩家出生在最左边的一个小岛上，或者直接出生在中间
-            Main.spawnTileX = 150;
+            Main.spawnTileX = 150; 
             Main.spawnTileY = 250;
             int island_x = Main.spawnTileX,cnt=4;
 
