@@ -67,7 +67,7 @@ namespace CalamityElegy.Content.Subworlds
             int mainIslandX = Main.maxTilesX - 150; // 靠近右侧边缘
             int mainIslandY = 300;                  // 固定的高度
             
-            // 调用函数：生成一个巨大的平缓岛屿（宽度 120，高度 40）
+            // 调用函数：生成一个巨大的平缓岛屿（宽度 200，高度 80）
             GenerateExquisiteIsland(mainIslandX, mainIslandY, 200, 80);
 
             // 4. 设置玩家出生点
