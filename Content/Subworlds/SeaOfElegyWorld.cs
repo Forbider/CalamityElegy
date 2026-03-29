@@ -7,6 +7,8 @@ using SubworldLibrary;
 using Terraria.ID;
 using System;
 using Microsoft.Xna.Framework;
+using CalamityElegy.Content.Tiles; 
+using CalamityElegy.Content.Items; 
 namespace CalamityElegy.Content.Subworlds
 {
     public class SeaOfElegySub : Subworld
@@ -64,14 +66,11 @@ namespace CalamityElegy.Content.Subworlds
                 generatIng=false;
             }
             // 2. 在中心生成平台
-            int mainIslandX = Main.maxTilesX - 150; // 靠近右侧边缘
-            int mainIslandY = 300;                  // 固定的高度
+            int mainIslandX = Main.maxTilesX - 150;
+            int mainIslandY = 300;                  
             
-            // 调用函数：生成一个巨大的平缓岛屿（宽度 200，高度 80）
+            // 生成一个平缓岛屿（宽度 200，高度 80）
             GenerateExquisiteIsland(mainIslandX, mainIslandY, 200, 80);
-
-            // 4. 设置玩家出生点
-            // 我们可以让玩家出生在最左边的一个小岛上，或者直接出生在中间
             Main.spawnTileX = 150; 
             Main.spawnTileY = 250;
             int island_x = Main.spawnTileX,cnt=4;
@@ -100,17 +99,37 @@ namespace CalamityElegy.Content.Subworlds
             if(generatIng){
                 GenerateMeteorCrater(centerX, centerY, 30);
             }
-
-            // 2. 在周围随机生成 2-4 个微型卫星岛
-            int satellites = WorldGen.genRand.Next(20, 30);
+            int offsetX;
+            int offsetY;
+            // 2. 在周围随机生成微型卫星岛
+            int satellites = WorldGen.genRand.Next(20, 41);
             for (int i = 0; i < satellites; i++)
             {
-                int offsetX = WorldGen.genRand.Next(-70, 71);
-                int offsetY = WorldGen.genRand.Next(-40, 41);
-                
+                offsetX = WorldGen.genRand.Next(-70, 71);
+                offsetY = WorldGen.genRand.Next(-10, 10);
+                //当卫星岛坐标与主岛重合时重新生成
+                while(offsetX>=-40&&offsetX<=40){
+                    offsetX = WorldGen.genRand.Next(-70, 71);
+                }
                 // 卫星岛要小很多
                 GenerateExquisiteIsland(centerX + offsetX, centerY + offsetY, 15, 10);
             }
+            // 横向范围可以稍微宽一点
+            offsetX = WorldGen.genRand.Next(-300, 301);
+            // 关键：Y 偏移必须是显著的负数，让它“飘”起来
+            // 比如在主岛上方 150 到 300 像素之间
+            offsetY = WorldGen.genRand.Next(-300, -150); 
+            int finalX = centerX + offsetX;
+            int finalY = centerY + offsetY;
+            // 安全检查
+            while (finalX < 50 || finalX > Main.maxTilesX - 50 || finalY < 50) {
+                offsetX = WorldGen.genRand.Next(-300, 301);
+                offsetY = WorldGen.genRand.Next(-300, -150);
+            }
+            // 空岛的特征：通常更细长或者更破碎
+            int sW = WorldGen.genRand.Next(8, 15);
+            int sH = WorldGen.genRand.Next(4, 8); 
+            GenerateExquisiteIsland(finalX, finalY, sW, sH);
         }
         public static void GenerateExquisiteIsland(int centerX, int centerY, int width, int maxHeight)
         {
@@ -164,51 +183,66 @@ namespace CalamityElegy.Content.Subworlds
                         // 底层：变黑的岩石或带有“钟乳石”感的滴落方块
                         tile.TileType = TileID.Ash; 
                     }
-                }
+                }            
+            }
+        }
+        public void GenerateStalactite(int x, int y, int length)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                int currentY = y + i;
+                if (!WorldGen.InWorld(x, currentY)) break;
 
-                // 5. 装饰：在边缘添加“抖动”碎片
-                if (WorldGen.genRand.NextBool(5)) {
-                    WorldGen.PlaceTile(x, topY + thickness + WorldGen.genRand.Next(1, 3), TileID.Cloud, true);
+                // 越往下越细
+                int width = (length - i) / 3; 
+                if (width < 1) width = 1;
+                for (int j = -width; j <= width; j++)
+                {
+                    Main.tile[x + j, currentY].TileType = TileID.Stone;
+                    WorldGen.SquareTileFrame(x + j, currentY);
                 }
+                if (WorldGen.genRand.NextBool(3)) x += WorldGen.genRand.Next(-1, 2);
             }
         }
         public void GenerateMeteorCrater(int centerX, int centerY, int radius)
         {
-            // 1. 挖掘核心空洞
+            // 先获取你的矿石 ID，避免在循环中重复调用
+            ushort shardType = (ushort)ModContent.TileType<DrownedShardsTile>();
+
+            // 1. 挖掘核心空洞与替换边缘
             for (int x = centerX - radius; x <= centerX + radius; x++)
             {
                 for (int y = centerY - radius; y <= centerY + radius; y++)
                 {
                     if (!WorldGen.InWorld(x, y)) continue;
 
-                    float dist = Vector2.Distance(new Vector2(x, y), new Vector2(centerX, centerY));
+                    // 使用平方距离判断（比 Vector2.Distance 快，省去开方运算）
+                    float dx = x - centerX;
+                    float dy = y - centerY;
+                    float distSq = dx * dx + dy * dy;
+                    float radSq = radius * radius;
 
-                    // 核心区域：完全挖空
-                    if (dist < radius * 0.8f)
+                    Tile tile = Main.tile[x, y]; // 获取当前方块引用
+
+                    // 核心区域：完全挖空 (80% 半径内)
+                    if (distSq < radSq * 0.64f) // 0.8 * 0.8 = 0.64
                     {
-                        Main.tile[x, y].ClearEverything();
-                        Main.tile[x, y].LiquidAmount = 0; // 冲击力排开了水
+                        tile.ClearEverything();
+                        tile.LiquidAmount = 0; 
                     }
-                    // 边缘区域：将原有方块替换为陨石矿或焦土
-                    else if (dist < radius)
+                    // 边缘区域：强行替换为沉溺碎晶 (80% 到 100% 半径)
+                    else if (distSq < radSq)
                     {
-                        if (Main.tile[x, y].HasTile) 
-                        {
-                            Main.tile[x, y].TileType = TileID.Meteorite; // 或者是你自定义的“挽歌碎片”
-                            WorldGen.SquareTileFrame(x, y);
-                        }
+                        // 不要用 PlaceTile，直接暴力修改数据
+                        tile.HasTile = true;
+                        tile.TileType = shardType;
+                        tile.Slope = 0; // 清除斜坡
+                        tile.IsHalfBlock = false; // 清除半砖
+                        
+                        // 让方块重新计算帧（决定它显示哪一部分贴图）
+                        WorldGen.SquareTileFrame(x, y, true);
                     }
                 }
-            }
-
-            // 2. 生成撞击喷溅的“碎片岛”
-            for (int i = 0; i < 5; i++)
-            {
-                int scatterX = centerX + WorldGen.genRand.Next(-radius * 2, radius * 2);
-                int scatterY = centerY + WorldGen.genRand.Next(-radius * 2, radius * 2);
-                
-                // 在坑周围生成微小的陨铁簇
-                WorldGen.TileRunner(scatterX, scatterY, WorldGen.genRand.Next(3, 6), 3, TileID.Meteorite, false, 0f, 0f, false, true);
             }
         }
     }

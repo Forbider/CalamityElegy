@@ -10,6 +10,11 @@ Mods: {
 				// DisplayName: Elegy Altar Item
 				// Tooltip: ""
 			}
+
+			DrownedShards: {
+				// DisplayName: Drowned Shards
+				// Tooltip: ""
+			}
 		}
 	}
 }
